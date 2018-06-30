@@ -7,6 +7,7 @@ output:
 
 
 ## Loading and preprocessing the data
+First, I load the packages I will use to process the data
 
 ```r
 library('tidyverse')
@@ -47,6 +48,7 @@ library('lubridate')
 ## 
 ##     date
 ```
+Then I load the data from the file into R, and convert the date formar to make it more usable in the next steps
 
 ```r
 data <- read_csv('activity.csv')
@@ -66,6 +68,7 @@ data <- read_csv('activity.csv')
 data$date <- ymd(data$date)
 ```
 ## What is mean total number of steps taken per day?
+This code takes the data, and calculates the total sum of steps for each day. It then plots the data as a histogram, as well as calculating the mean and the median of the total steps per day
 
 ```r
 data %>% group_by(date) %>% summarise_at('steps', sum, na.rm = T) -> total_steps_per_day
@@ -94,7 +97,8 @@ median(total_steps_per_day$steps)
 
 
 ## What is the average daily activity pattern?
-
+Now instead of looking at the total activity per day, I will look at the mean activity per time window. NAs were removed for the calculations.
+I also found the time interval where the activity is higher on average
 
 ```r
 data %>% group_by(interval) %>% summarise_at('steps', mean, na.rm = T) -> average_by_time
@@ -119,7 +123,8 @@ average_by_time[which(average_by_time$steps == max_steps),]
 
 
 ## Imputing missing values
-
+The steps data contains a lot of missing values. To input them, I will use the average data for that time period. 
+Afterwards, I calculated the total number of steps per day for the new input data. I then plotted them as a histogram. The mean and median of the dataset are available below
 
 ```r
 sum(is.na(data$steps))
@@ -160,6 +165,7 @@ median(input_total_steps_per_day$steps)
 ```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+To answer this question, I separated the input data into two groups: acquired on a weekend or during the week. Then I calculated the average number of steps for each time interval. I plotted both in two separate panels to show the difference in activity between the two type of days. 
 
 ```r
 input_data$weekday <- wday(input_data$date, label = T)

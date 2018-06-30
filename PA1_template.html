@@ -124,6 +124,7 @@ $(document).ready(function () {
 
 <div id="loading-and-preprocessing-the-data" class="section level2">
 <h2>Loading and preprocessing the data</h2>
+<p>First, I load the packages I will use to process the data</p>
 <pre class="r"><code>library('tidyverse')</code></pre>
 <pre><code>## -- Attaching packages -- tidyverse 1.2.1 --</code></pre>
 <pre><code>## v ggplot2 2.2.1     v purrr   0.2.4
@@ -140,6 +141,7 @@ $(document).ready(function () {
 <pre><code>## The following object is masked from 'package:base':
 ## 
 ##     date</code></pre>
+<p>Then I load the data from the file into R, and convert the date formar to make it more usable in the next steps</p>
 <pre class="r"><code>data &lt;- read_csv('activity.csv')</code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
@@ -152,6 +154,7 @@ data$date &lt;- ymd(data$date)</code></pre>
 </div>
 <div id="what-is-mean-total-number-of-steps-taken-per-day" class="section level2">
 <h2>What is mean total number of steps taken per day?</h2>
+<p>This code takes the data, and calculates the total sum of steps for each day. It then plots the data as a histogram, as well as calculating the mean and the median of the total steps per day</p>
 <pre class="r"><code>data %&gt;% group_by(date) %&gt;% summarise_at('steps', sum, na.rm = T) -&gt; total_steps_per_day
 
 
@@ -164,6 +167,7 @@ hist(total_steps_per_day$steps, main ='Histogram of total number of steps per da
 </div>
 <div id="what-is-the-average-daily-activity-pattern" class="section level2">
 <h2>What is the average daily activity pattern?</h2>
+<p>Now instead of looking at the total activity per day, I will look at the mean activity per time window. NAs were removed for the calculations. I also found the time interval where the activity is higher on average</p>
 <pre class="r"><code>data %&gt;% group_by(interval) %&gt;% summarise_at('steps', mean, na.rm = T) -&gt; average_by_time
 
 p &lt;- ggplot(average_by_time, aes(x = interval, y = steps))
@@ -178,6 +182,7 @@ average_by_time[which(average_by_time$steps == max_steps),]</code></pre>
 </div>
 <div id="imputing-missing-values" class="section level2">
 <h2>Imputing missing values</h2>
+<p>The steps data contains a lot of missing values. To input them, I will use the average data for that time period. Afterwards, I calculated the total number of steps per day for the new input data. I then plotted them as a histogram. The mean and median of the dataset are available below</p>
 <pre class="r"><code>sum(is.na(data$steps))</code></pre>
 <pre><code>## [1] 2304</code></pre>
 <pre class="r"><code>input_data &lt;-merge(data, average_by_time, by = 'interval', all.y = T)
@@ -197,6 +202,7 @@ hist(input_total_steps_per_day$steps, main ='Histogram of total number of steps 
 </div>
 <div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level2">
 <h2>Are there differences in activity patterns between weekdays and weekends?</h2>
+<p>To answer this question, I separated the input data into two groups: acquired on a weekend or during the week. Then I calculated the average number of steps for each time interval. I plotted both in two separate panels to show the difference in activity between the two type of days.</p>
 <pre class="r"><code>input_data$weekday &lt;- wday(input_data$date, label = T)
 input_data$weekend &lt;- ifelse(input_data$weekday == 'Sat' | input_data$weekday == 'Sun','weekend','weekday')
 
